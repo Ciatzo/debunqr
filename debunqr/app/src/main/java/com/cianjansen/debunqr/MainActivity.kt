@@ -3,18 +3,17 @@ package com.cianjansen.debunqr
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import com.bunq.sdk.context.ApiContext
+import com.bunq.sdk.context.ApiEnvironmentType
+import com.bunq.sdk.model.generated.endpoint.Payment
+import com.bunq.sdk.model.generated.endpoint.SandboxUserPerson
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
-import io.reactivex.rxjava3.core.Observable
-import io.reactivex.rxjava3.core.ObservableOnSubscribe
-import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
 import okhttp3.Response
-import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -24,10 +23,11 @@ class MainActivity : AppCompatActivity() {
 
         testButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
-                println("click")
-                getNewSandboxApiKey()
+                setupApiContext()
             }
         })
+
+    
 
     }
 
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val response: Response = client.newCall(request).execute()
                     println(response.code())
-                    val responseString: String = response.body().string()
+                    val responseString: String = response.body()!!.string()
                     print("Response:")
                     println(responseString)
                     val jsonObject: JsonObject = Gson().fromJson(responseString, JsonObject::class.java)
@@ -74,6 +74,13 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-
+    private fun setupApiContext(){
+        val apiContext = ApiContext.create(
+            ApiEnvironmentType.SANDBOX, "sandbox_c518ee084f55f57a8fa850d941b9d77a6523137ad155a3a9839d4fb8",
+            "DEVICE_DESCRIPTION"
+        )
+        apiContext.save()
+        if(apiContext.ensureSessionActive()) println("active") else println("not active")
+    }
 
 }
