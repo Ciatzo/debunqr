@@ -1,5 +1,6 @@
 package com.cianjansen.debunqr
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -13,6 +14,7 @@ import com.bunq.sdk.context.ApiContext
 import com.bunq.sdk.context.ApiEnvironmentType
 import com.bunq.sdk.model.generated.`object`.Amount
 import com.bunq.sdk.model.generated.endpoint.Payment
+import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import kotlinx.android.synthetic.main.activity_main.*
@@ -114,6 +116,17 @@ class MainActivity : AppCompatActivity() {
             descriptionLayout.addView(paymentTypeTextView)
 
 
+            parent.setOnClickListener(object : View.OnClickListener {
+                override fun onClick(v: View?) {
+                    println("clicking view")
+                    val intent = Intent(this, PaymentDetailView::class.java).apply {
+                        putExtra("EXTRA_MESSAGE", "message")
+                    }
+                    startActivity(intent)
+
+
+                }
+            })
             scrollContainer.addView(parent)
         }
 
