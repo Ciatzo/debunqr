@@ -53,13 +53,13 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <TextView
-                android:id="@+id/textView4"
+                android:id="@+id/balanceTitleTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="bunq balance" />
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/balanceValueTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="€13.37"

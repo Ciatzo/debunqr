@@ -3,6 +3,7 @@ package com.cianjansen.debunqr
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import android.widget.RelativeLayout
@@ -11,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bunq.sdk.context.ApiContext
 import com.bunq.sdk.context.BunqContext
+import com.bunq.sdk.model.generated.endpoint.MonetaryAccount
 import com.bunq.sdk.model.generated.endpoint.Payment
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.core.Single
@@ -23,7 +25,6 @@ import java.time.format.DateTimeFormatter
 class MainActivity : AppCompatActivity() {
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity() {
         updateButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 showPaymentList()
+                updateBalance()
 
             }
         })
@@ -51,14 +53,17 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         showPaymentList()
+        updateBalance()
     }
 
     /**
      * Update list of payments by retrieving all completed payments by current user from bunq server
      */
-    private fun showPaymentList(){
+    private fun showPaymentList() {
         Single.fromCallable {
-            val apiContext = ApiContext.restore(applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf")
+            val apiContext = ApiContext.restore(
+                applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf"
+            )
             BunqContext.loadApiContext(apiContext)
 
 
@@ -121,7 +126,10 @@ class MainActivity : AppCompatActivity() {
                     val paymentTypeTextView = TextView(this)
                     paymentTypeTextView.setTextColor(Color.parseColor("#C9C9C9"))
 
-                    val l = LocalDate.parse(it.created, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn"))
+                    val l = LocalDate.parse(
+                        it.created,
+                        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn")
+                    )
 
                     dateTextView.text = "${l.dayOfMonth} ${l.month} ${l.year}"
                     aliasTextView.text = it.counterpartyAlias.displayName
@@ -151,8 +159,33 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
-    private fun updatBalance(){
-        
+    private fun updateBalance() {
+
+        Single.fromCallable {
+            val apiContext = ApiContext.restore(
+                applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf"
+            )
+            val list = MonetaryAccount.list().value
+
+
+            return@fromCallable list
+        }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ list ->
+                val accountList: List<MonetaryAccount> = list
+                if (accountList.size == 1){
+                    val balance = accountList[0].monetaryAccountBank.balance.value
+                    val balanceTextView : TextView = findViewById(R.id.balanceValueTextView)
+                    balanceTextView.text = "€$balance"
+                }
+
+
+
+            }, {
+                it.printStackTrace()
+            })
+
     }
 
 
