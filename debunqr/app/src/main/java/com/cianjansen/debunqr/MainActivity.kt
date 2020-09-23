@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                     )
 
 
-                    parentParams.setMargins(10, 10, 10, 10)
+                    parentParams.setMargins(15, 15, 15, 15)
 
                     parent.layoutParams = parentParams
 //                    parent.orientation = LinearLayout.HORIZONTAL
@@ -127,7 +127,7 @@ class MainActivity : AppCompatActivity() {
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn")
                     )
 
-                    dateTextView.text = "${l.dayOfMonth} ${l.month} ${l.year}"
+                    dateTextView.text = "${l.dayOfMonth} ${l.month.toString().toLowerCase().capitalize()} ${l.year}"
                     var desc : String = it.description
                     if(desc.length > 35){
                         desc = desc.substring(0, 34) + "..."
@@ -161,7 +161,14 @@ class MainActivity : AppCompatActivity() {
                         override fun onClick(v: View?) {
                             println("clicking payment " + it.description)
                             val intent = Intent(this@MainActivity, PaymentDetailView::class.java).apply {
-                                putExtra("EXTRA_MESSAGE", "message")
+                                putExtra("DESCRIPTION", it.description)
+                                putExtra("CREATED", it.created)
+                                putExtra("ALIASNAME", it.alias.displayName)
+                                putExtra("ALIASIBAN", it.alias.iban)
+                                putExtra("AMOUNT", it.amount.value)
+                                putExtra("COUNTERALIASNAME", it.counterpartyAlias.displayName)
+                                putExtra("COUNTERALIASIBAN", it.counterpartyAlias.iban)
+
                             }
                             startActivity(intent)
 

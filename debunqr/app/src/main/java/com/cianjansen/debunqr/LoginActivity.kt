@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.provider.AlarmClock.EXTRA_MESSAGE
 import android.util.Log
 import android.view.View
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.bunq.sdk.context.ApiContext
@@ -39,6 +40,14 @@ class LoginActivity : AppCompatActivity() {
         useExistingUserButton.setOnClickListener(object : View.OnClickListener {
             override fun onClick(v: View?) {
                 useCurrentUser()
+            }
+        })
+
+        customKeyButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                val customEditText : EditText = findViewById(R.id.customKeyEditText)
+                val customKey = customKeyEditText.text.toString()
+                setupApiContext(customKey)
             }
         })
 
