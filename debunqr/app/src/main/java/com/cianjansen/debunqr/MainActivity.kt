@@ -1,5 +1,6 @@
 package com.cianjansen.debunqr
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
@@ -31,6 +32,13 @@ class MainActivity : AppCompatActivity() {
             override fun onClick(v: View?) {
                 showPaymentList()
 
+            }
+        })
+        newPaymentButton.setOnClickListener(object : View.OnClickListener {
+            override fun onClick(v: View?) {
+                val intent = Intent(this@MainActivity, CreatePaymentActivity::class.java).apply {
+                }
+                startActivity(intent)
             }
         })
         showPaymentList()

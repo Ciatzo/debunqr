@@ -143,7 +143,7 @@ class LoginActivity : AppCompatActivity() {
     private fun useCurrentUser(){
         try {
             val apiContext = ApiContext.restore(applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf")
-            val intent = Intent(this, MainActivity::class.java).apply {
+            val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
             }
             startActivity(intent)
 
