@@ -151,6 +151,9 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
+    private fun updatBalance(){
+        
+    }
 
 
 }
