@@ -3,13 +3,12 @@ package com.cianjansen.debunqr
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.RelativeLayout.*
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import com.bunq.sdk.context.ApiContext
 import com.bunq.sdk.context.BunqContext
 import com.bunq.sdk.model.generated.endpoint.MonetaryAccount
@@ -78,15 +77,17 @@ class MainActivity : AppCompatActivity() {
                 println("List of payments size: " + listOfPayments.size)
                 listOfPayments.forEach {
 
-                    val parent = LinearLayout(this)
+                    val parent = ConstraintLayout(this)
                     val parentParams = LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                         LinearLayout.LayoutParams.WRAP_CONTENT
                     )
+
+
                     parentParams.setMargins(10, 10, 10, 10)
 
                     parent.layoutParams = parentParams
-                    parent.orientation = LinearLayout.HORIZONTAL
+//                    parent.orientation = LinearLayout.HORIZONTAL
 
 
                     //children of parent linearlayout
@@ -99,14 +100,8 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         amountTextView.setTextColor(Color.parseColor("#ff3300"))
                     }
+                    amountTextView.textSize = 20F
 
-
-                    val textViewParams = RelativeLayout.LayoutParams(
-                        RelativeLayout.LayoutParams.WRAP_CONTENT,
-                        RelativeLayout.LayoutParams.WRAP_CONTENT
-                    )
-
-                    amountTextView.layoutParams = textViewParams
 
                     val descriptionLayout = LinearLayout(this)
                     descriptionLayout.layoutParams = LinearLayout.LayoutParams(
@@ -115,8 +110,8 @@ class MainActivity : AppCompatActivity() {
                     )
                     descriptionLayout.orientation = LinearLayout.VERTICAL
 
-                    parent.addView(descriptionLayout)
-                    parent.addView(amountTextView)
+
+
 
                     //children of descriptionLayout (left hand side) LinearLayout
                     val dateTextView = TextView(this)
@@ -133,7 +128,11 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     dateTextView.text = "${l.dayOfMonth} ${l.month} ${l.year}"
-                    aliasTextView.text = "${it.description} - ${it.counterpartyAlias.displayName}"
+                    var desc : String = it.description
+                    if(desc.length > 35){
+                        desc = desc.substring(0, 34) + "..."
+                    }
+                    aliasTextView.text = "${desc}  |  ${it.counterpartyAlias.displayName}"
                     paymentTypeTextView.text = it.type
 
 
@@ -141,14 +140,30 @@ class MainActivity : AppCompatActivity() {
                     descriptionLayout.addView(aliasTextView)
                     descriptionLayout.addView(paymentTypeTextView)
 
+                    descriptionLayout.id = View.generateViewId()
+                    amountTextView.id = View.generateViewId()
+                    parent.id = View.generateViewId()
+                    parent.addView(descriptionLayout)
+                    parent.addView(amountTextView)
+                    val set = ConstraintSet()
+                    set.clone(parent)
+                    set.connect(descriptionLayout.id, ConstraintSet.START, parent.id, ConstraintSet.START)
+                    set.connect(descriptionLayout.id, ConstraintSet.TOP, parent.id, ConstraintSet.TOP)
+                    set.connect(descriptionLayout.id, ConstraintSet.BOTTOM, parent.id, ConstraintSet.BOTTOM)
+
+                    set.connect(amountTextView.id, ConstraintSet.END, parent.id, ConstraintSet.END)
+                    set.connect(descriptionLayout.id, ConstraintSet.TOP, parent.id, ConstraintSet.TOP)
+                    set.connect(descriptionLayout.id, ConstraintSet.BOTTOM, parent.id, ConstraintSet.BOTTOM)
+                    set.applyTo(parent)
+
 
                     parent.setOnClickListener(object : View.OnClickListener {
                         override fun onClick(v: View?) {
                             println("clicking payment " + it.description)
-//                    val intent = Intent(this, PaymentDetailView::class.java).apply {
-//                        putExtra("EXTRA_MESSAGE", "message")
-//                    }
-//                    startActivity(intent)
+                            val intent = Intent(this@MainActivity, PaymentDetailView::class.java).apply {
+                                putExtra("EXTRA_MESSAGE", "message")
+                            }
+                            startActivity(intent)
 
 
                         }

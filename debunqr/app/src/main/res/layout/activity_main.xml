@@ -17,8 +17,8 @@
         app:srcCompat="@drawable/bar" />
 
     <ScrollView
-        android:layout_width="409dp"
-        android:layout_height="582dp"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
         android:layout_marginTop="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,7 +28,7 @@
         <LinearLayout
             android:id="@+id/scrollLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical">
 
 
@@ -63,7 +63,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="€13.37"
-                android:textSize="30sp" />
+                android:textColor="#8BC34A"
+                android:textSize="42sp" />
         </LinearLayout>
 
         <LinearLayout
