@@ -121,6 +121,7 @@ class MainActivity : AppCompatActivity() {
                     //children of descriptionLayout (left hand side) LinearLayout
                     val dateTextView = TextView(this)
                     dateTextView.setTextColor(Color.parseColor("#F4F4F4"))
+                    dateTextView.textSize = 10F
                     val aliasTextView = TextView(this)
                     aliasTextView.setTextColor(Color.parseColor("#FFFFFF"))
                     val paymentTypeTextView = TextView(this)
@@ -132,7 +133,7 @@ class MainActivity : AppCompatActivity() {
                     )
 
                     dateTextView.text = "${l.dayOfMonth} ${l.month} ${l.year}"
-                    aliasTextView.text = it.counterpartyAlias.displayName
+                    aliasTextView.text = "${it.description} - ${it.counterpartyAlias.displayName}"
                     paymentTypeTextView.text = it.type
 
 
