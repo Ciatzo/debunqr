@@ -19,6 +19,9 @@ class PaymentDetailView : AppCompatActivity() {
     }
 
 
+    /**
+     * Populate all designated text views with the data passed in Intent extras
+     */
     private fun fillFields(savedInstanceState: Bundle?){
         val description: String?
         val created: String?
