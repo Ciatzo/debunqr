@@ -58,7 +58,7 @@ class MainActivity : AppCompatActivity() {
         // Load api context and request payments in separate thread
         Single.fromCallable {
             val apiContext = ApiContext.restore(
-                applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf"
+                ConfigDirectory.getDirectory(applicationContext)
             )
             BunqContext.loadApiContext(apiContext)
 
@@ -205,7 +205,7 @@ class MainActivity : AppCompatActivity() {
 
         Single.fromCallable {
             val apiContext = ApiContext.restore(
-                applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf"
+                ConfigDirectory.getDirectory(applicationContext)
             )
             val list = MonetaryAccount.list().value
 

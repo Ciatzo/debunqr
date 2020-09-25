@@ -45,7 +45,7 @@ class CreatePaymentActivity : AppCompatActivity() {
         isClickable = false
         Single.fromCallable {
             val apiContext = ApiContext.restore(
-                applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf"
+                ConfigDirectory.getDirectory(applicationContext)
             )
             BunqContext.loadApiContext(apiContext)
 

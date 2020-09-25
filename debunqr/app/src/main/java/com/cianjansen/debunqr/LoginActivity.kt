@@ -109,10 +109,10 @@ class LoginActivity : AppCompatActivity() {
                     "DEVICE_DESCRIPTION"
                 )
                 apiContext.save(
-                    applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf"
+                    ConfigDirectory.getDirectory(applicationContext)
                 )
                 return@fromCallable ApiContext.restore(
-                    applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf"
+                    ConfigDirectory.getDirectory(applicationContext)
                 ).apiKey
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -140,14 +140,18 @@ class LoginActivity : AppCompatActivity() {
      * Start main activity if there is a current registered user
      */
     private fun useCurrentUser(){
-        try {
-            val apiContext = ApiContext.restore(applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf")
-            val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
-            }
-            startActivity(intent)
+        val confFile = File(ConfigDirectory.getDirectory(applicationContext))
+        if(confFile.exists()){
+            try {
+                val apiContext = ApiContext.restore(ConfigDirectory.getDirectory(applicationContext))
+                val intent = Intent(this@LoginActivity, MainActivity::class.java).apply {
+                }
+                startActivity(intent)
 
-        }catch (e : java.lang.Exception){
-            Log.i("debug","No current user")
+            }catch (e : java.lang.Exception){
+                Log.i("debug","No current user")
+            }
+        }else{
             val snackbar = Snackbar
                 .make(
                     findViewById(R.id.outerConstraintLayout),
@@ -156,20 +160,26 @@ class LoginActivity : AppCompatActivity() {
                 )
             snackbar.show()
         }
+
     }
 
     /**
      * Shows current user
      */
     private fun showCurrentUser(){
-        try {
-            val apiContext = ApiContext.restore(applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf")
-            val currentUserView : TextView = findViewById(R.id.currentUserView)
-            currentUserView.text = "Current User:\n${apiContext.apiKey}"
-        }catch (e : java.lang.Exception){
-            Log.i("debug","No current user")
+        val confFile = File(ConfigDirectory.getDirectory(applicationContext))
+        val currentUserView : TextView = findViewById(R.id.currentUserView)
+        if (confFile.exists()){
+            try {
+                val apiContext = ApiContext.restore(ConfigDirectory.getDirectory(applicationContext))
+                currentUserView.text = "Current User:\n${apiContext.apiKey}"
+            }catch (e : java.lang.Exception){
+                Log.i("debug","No current user")
+            }
+        }else{
             currentUserView.text = "No current user registered"
         }
+
     }
 
 }
