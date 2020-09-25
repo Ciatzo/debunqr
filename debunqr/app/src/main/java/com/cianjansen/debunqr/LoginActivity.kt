@@ -31,25 +31,15 @@ class LoginActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
 
-        newUserButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                generateApiKey()
-            }
-        })
+        newUserButton.setOnClickListener { generateApiKey() }
 
-        useExistingUserButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                useCurrentUser()
-            }
-        })
+        useExistingUserButton.setOnClickListener { useCurrentUser() }
 
-        customKeyButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                val customEditText : EditText = findViewById(R.id.customKeyEditText)
-                val customKey = customKeyEditText.text.toString()
-                setupApiContext(customKey)
-            }
-        })
+        customKeyButton.setOnClickListener {
+            val customEditText : EditText = findViewById(R.id.customKeyEditText)
+            val customKey = customKeyEditText.text.toString()
+            setupApiContext(customKey)
+        }
 
         showCurrentUser()
     }

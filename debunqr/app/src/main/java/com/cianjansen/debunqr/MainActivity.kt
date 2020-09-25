@@ -28,22 +28,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        updateButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                showPaymentList()
-                updateBalance()
+        updateButton.setOnClickListener {
+            showPaymentList()
+            updateBalance()
+        }
 
+        newPaymentButton.setOnClickListener {
+            val intent = Intent(this@MainActivity, CreatePaymentActivity::class.java).apply {
             }
-        })
-        newPaymentButton.setOnClickListener(object : View.OnClickListener {
-            override fun onClick(v: View?) {
-                val intent = Intent(this@MainActivity, CreatePaymentActivity::class.java).apply {
-                }
-                startActivity(intent)
-            }
-        })
+            startActivity(intent)
+        }
+
         showPaymentList()
-
     }
 
     /**
@@ -59,6 +55,7 @@ class MainActivity : AppCompatActivity() {
      * Update list of payments by retrieving all completed payments by current user from bunq server
      */
     private fun showPaymentList() {
+        // Load api context and request payments in separate thread
         Single.fromCallable {
             val apiContext = ApiContext.restore(
                 applicationContext.getExternalFilesDir("conf").toString() + "bunq.conf"
@@ -71,10 +68,10 @@ class MainActivity : AppCompatActivity() {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ listOfPayments ->
+
                 val scrollContainer: LinearLayout = findViewById(R.id.scrollLayout)
                 scrollContainer.removeAllViews()
 
-                println("List of payments size: " + listOfPayments.size)
                 listOfPayments.forEach {
 
                     val parent = ConstraintLayout(this)
@@ -87,13 +84,10 @@ class MainActivity : AppCompatActivity() {
                     parentParams.setMargins(15, 15, 15, 15)
 
                     parent.layoutParams = parentParams
-//                    parent.orientation = LinearLayout.HORIZONTAL
 
 
-                    //children of parent linearlayout
                     val amountTextView = TextView(this)
                     val amount = it.amount.value
-//                    val amount = "8.70"
                     amountTextView.text = amount
                     if (amount.toDouble() >= 0) {
                         amountTextView.setTextColor(Color.parseColor("#00ff80"))
@@ -111,9 +105,6 @@ class MainActivity : AppCompatActivity() {
                     descriptionLayout.orientation = LinearLayout.VERTICAL
 
 
-
-
-                    //children of descriptionLayout (left hand side) LinearLayout
                     val dateTextView = TextView(this)
                     dateTextView.setTextColor(Color.parseColor("#F4F4F4"))
                     dateTextView.textSize = 10F
@@ -127,10 +118,11 @@ class MainActivity : AppCompatActivity() {
                         DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnn")
                     )
 
-                    dateTextView.text = "${l.dayOfMonth} ${l.month.toString().toLowerCase().capitalize()} ${l.year}"
-                    var desc : String = it.description
-                    if(desc.length > 35){
-                        desc = desc.substring(0, 34) + "..."
+                    dateTextView.text =
+                        "${l.dayOfMonth} ${l.month.toString().toLowerCase().capitalize()} ${l.year}"
+                    var desc: String = it.description
+                    if (desc.length > 25) {
+                        desc = desc.substring(0, 24) + "..."
                     }
                     aliasTextView.text = "${desc}  |  ${it.counterpartyAlias.displayName}"
                     paymentTypeTextView.text = it.type
@@ -147,29 +139,53 @@ class MainActivity : AppCompatActivity() {
                     parent.addView(amountTextView)
                     val set = ConstraintSet()
                     set.clone(parent)
-                    set.connect(descriptionLayout.id, ConstraintSet.START, parent.id, ConstraintSet.START)
-                    set.connect(descriptionLayout.id, ConstraintSet.TOP, parent.id, ConstraintSet.TOP)
-                    set.connect(descriptionLayout.id, ConstraintSet.BOTTOM, parent.id, ConstraintSet.BOTTOM)
+                    set.connect(
+                        descriptionLayout.id,
+                        ConstraintSet.START,
+                        parent.id,
+                        ConstraintSet.START
+                    )
+                    set.connect(
+                        descriptionLayout.id,
+                        ConstraintSet.TOP,
+                        parent.id,
+                        ConstraintSet.TOP
+                    )
+                    set.connect(
+                        descriptionLayout.id,
+                        ConstraintSet.BOTTOM,
+                        parent.id,
+                        ConstraintSet.BOTTOM
+                    )
+
 
                     set.connect(amountTextView.id, ConstraintSet.END, parent.id, ConstraintSet.END)
-                    set.connect(descriptionLayout.id, ConstraintSet.TOP, parent.id, ConstraintSet.TOP)
-                    set.connect(descriptionLayout.id, ConstraintSet.BOTTOM, parent.id, ConstraintSet.BOTTOM)
+                    set.connect(amountTextView.id, ConstraintSet.TOP, parent.id, ConstraintSet.TOP)
+                    set.connect(
+                        amountTextView.id,
+                        ConstraintSet.BOTTOM,
+                        parent.id,
+                        ConstraintSet.BOTTOM
+                    )
                     set.applyTo(parent)
 
 
                     parent.setOnClickListener(object : View.OnClickListener {
+                        /**
+                         * Open payment detail view activity with details of selected payment
+                         */
                         override fun onClick(v: View?) {
-                            println("clicking payment " + it.description)
-                            val intent = Intent(this@MainActivity, PaymentDetailView::class.java).apply {
-                                putExtra("DESCRIPTION", it.description)
-                                putExtra("CREATED", it.created)
-                                putExtra("ALIASNAME", it.alias.displayName)
-                                putExtra("ALIASIBAN", it.alias.iban)
-                                putExtra("AMOUNT", it.amount.value)
-                                putExtra("COUNTERALIASNAME", it.counterpartyAlias.displayName)
-                                putExtra("COUNTERALIASIBAN", it.counterpartyAlias.iban)
+                            val intent =
+                                Intent(this@MainActivity, PaymentDetailView::class.java).apply {
+                                    putExtra("DESCRIPTION", it.description)
+                                    putExtra("CREATED", it.created)
+                                    putExtra("ALIASNAME", it.alias.displayName)
+                                    putExtra("ALIASIBAN", it.alias.iban)
+                                    putExtra("AMOUNT", it.amount.value)
+                                    putExtra("COUNTERALIASNAME", it.counterpartyAlias.displayName)
+                                    putExtra("COUNTERALIASIBAN", it.counterpartyAlias.iban)
 
-                            }
+                                }
                             startActivity(intent)
 
 
@@ -182,6 +198,9 @@ class MainActivity : AppCompatActivity() {
             })
     }
 
+    /**
+     * Update balance by retrieving current balance from bunq server
+     */
     private fun updateBalance() {
 
         Single.fromCallable {
@@ -197,12 +216,11 @@ class MainActivity : AppCompatActivity() {
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ list ->
                 val accountList: List<MonetaryAccount> = list
-                if (accountList.size == 1){
+                if (accountList.size == 1) {
                     val balance = accountList[0].monetaryAccountBank.balance.value
-                    val balanceTextView : TextView = findViewById(R.id.balanceValueTextView)
+                    val balanceTextView: TextView = findViewById(R.id.balanceValueTextView)
                     balanceTextView.text = "€$balance"
                 }
-
 
 
             }, {
